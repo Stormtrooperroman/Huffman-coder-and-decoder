@@ -4,7 +4,6 @@
 #include <string>
 #include <queue>
 #include <unordered_map>
-#include <cmath>
 
 using namespace std;
 
@@ -62,7 +61,6 @@ void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huff
 
 int coder(const char* input_name="input.txt", const char* output_name="encoded.txt"){
     unsigned long long * alfabet = new unsigned long long [256];
-    unsigned long long all = 0;
     for(int i=0; i<256; i++){
         alfabet[i] = 0;
     }
@@ -76,9 +74,7 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
        character = fgetc(input_file);
        if(!feof(input_file)){
            alfabet[character]++;
-           all++;
        }
-       
     }
     
     fclose(input_file);
@@ -116,8 +112,9 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
 
     unsigned int bit_len = 0;
     unsigned char letter=0;
-
-    
+    char col_letters = tree.size();
+    fputc(col_letters, output_file);
+    // fwrite(reinterpret_cast<const char*>(&col_letters), sizeof(int), 1, output_file);
     for(int i=0; i<256; i++){
         if(alfabet[i] != 0){
             fputc((char)i, output_file);
@@ -142,28 +139,33 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
                 
                 for(int i = 0; i<8-bit_len; i++){
                     letter = letter<<1 | (huffmanCode[s][i] - '0');
-                    
-                } 
+                }
                 if(huffmanCode[s].length()-8+bit_len >= 8){
-                    int some =huffmanCode[s].length()-8+bit_len;
-                    int i;
-                    for( i = 8-bit_len; i < huffmanCode[s].length();  i+=8){
+                    int i= 8-bit_len;
+                    while( i + 7< huffmanCode[s].length()){
                         k=0;
+                        
                         for(int j = 0; j<8; j++){
-                            k = k<<1 | (huffmanCode[s][i*8+j] - '0');
+                            k = k<<1 | (huffmanCode[s][i+j] - '0');
+                            
                         }
+                        i+=8;
                         fputc(letter, output_file);
                         letter = k;
                         
                     }
                     k = 0;
-                    for(int j = huffmanCode[s].length() - (i-8); i<huffmanCode[s].length(); j++){
-                        cout<<i-8<<" : "<<j<<endl;
+                    len=0;
+                    
+                    
+                    for(int j = i; j<huffmanCode[s].length(); j++){
+                        cout<<s<<" : "<<j<<endl;
                         k = k<<1 | (huffmanCode[s][j] - '0');
                         len++;
                     }
                 }
                 else{
+                    len=0;
                     for(int i = 8-bit_len; i<huffmanCode[s].length(); i++){
                         k = k<<1 | (huffmanCode[s][i] - '0');
                         len++;
@@ -200,6 +202,5 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
 }
 
 int main(){
-    
     coder();
 }
