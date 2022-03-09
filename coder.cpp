@@ -104,7 +104,7 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
 	for (auto pair: huffmanCode) {
 		cout << pair.first << " " << pair.second << '\n';
 	}
-    // cout<<huffmanCode["a"]<<endl;
+    
 
 
     FILE* output_file = fopen(output_name, "w +");
@@ -142,9 +142,7 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
             //     len = x - 8-bit_len;
             //     bit_len += 8-bit_len;
             // }
-            
             if(bit_len+huffmanCode[s].length()<=8){
-                
                 for(int i = 0; i<huffmanCode[s].length(); i++){
                     letter = letter<<1 | (huffmanCode[s][i] - '0');
                 }
@@ -155,26 +153,50 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
                 
                 for(int i = 0; i<8-bit_len; i++){
                     letter = letter<<1 | (huffmanCode[s][i] - '0');
+                    
                 } 
-
-                for(int i = 8-bit_len; i<huffmanCode[s].length(); i++){
-                    k = k<<1 | (huffmanCode[s][i] - '0');
-                    len++;
+                if(huffmanCode[s].length()-8+bit_len >= 8){
+                    int some =huffmanCode[s].length()-8+bit_len;
+                    int i;
+                    for( i = 8-bit_len; i < huffmanCode[s].length();  i+=8){
+                        k=0;
+                        for(int j = 0; j<8; j++){
+                            k = k<<1 | (huffmanCode[s][i*8+j] - '0');
+                            
+                        }
+                        fputc(letter, output_file);
+                        letter = k;
+                        
+                    }
+                    k = 0;
+                    for(int j = huffmanCode[s].length() - (i-8); i<huffmanCode[s].length(); j++){
+                        cout<<i-8<<" : "<<j<<endl;
+                        k = k<<1 | (huffmanCode[s][j] - '0');
+                        len++;
+                    }
                 }
-
+                else{
+                    for(int i = 8-bit_len; i<huffmanCode[s].length(); i++){
+                        k = k<<1 | (huffmanCode[s][i] - '0');
+                        len++;
+                    }
+                }
+                
+                
+                
                 bit_len = 8; 
             }
-
+            
             if(bit_len == 8){
+                
                 fputc(letter, output_file);
+                
                 letter = k;
                 bit_len = len;
                 k=0;
                 len=0;
             }
-            else if(bit_len > 8){
-                throw invalid_argument("Error man");
-            }
+            
             
        }
        else if(bit_len<8){
