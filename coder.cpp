@@ -4,21 +4,22 @@
 #include <string>
 #include <queue>
 #include <unordered_map>
+#include <sys/stat.h>
 
 using namespace std;
 
-class Node{
+class Node{ //A tree node
     public:
     string key;
     unsigned long long size;
     Node *R;
     Node *L;
 
-    bool operator() (const Node& x, const Node& y){
+    bool operator() (const Node& x, const Node& y){ // Comparison function to be used to order the heap
         return x.size >= y.size;
     }
 
-    Node (const string& value = "", unsigned long long amount = 0, Node * left = NULL, Node * right = NULL) {
+    Node (const string& value = "", unsigned long long amount = 0, Node * left = NULL, Node * right = NULL) { // Node constructor 
         key = value; 
         size = amount;
         L = left; 
@@ -26,14 +27,14 @@ class Node{
     }
 
 
-    Node * join (Node x) {
+    Node * join (Node x) { // Node pooling function
         return new Node( x.key+key , x.size + size, new Node(x), this);
     }
     
 };
 
 
-Node * builder(priority_queue<Node, vector<Node>, Node> tree) {
+Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffman tree
     while (tree.size() > 1) {
             Node *n = new Node(tree.top());
            
@@ -46,7 +47,7 @@ Node * builder(priority_queue<Node, vector<Node>, Node> tree) {
 }
 
 
-void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huffmanCode)
+void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huffmanCode) // Generate Huffman codes
 {
 	if (root == nullptr)
 		return;
@@ -59,7 +60,7 @@ void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huff
 	huffmanCodes(root->R, code+ "1", huffmanCode);
 }
 
-int coder(const char* input_name="input.txt", const char* output_name="encoded.txt"){
+double coder(const char* input_name="input.txt", const char* output_name="encoded.txt"){ // Coding function
     unsigned long long * alfabet = new unsigned long long [256];
     for(int i=0; i<256; i++){
         alfabet[i] = 0;
@@ -114,8 +115,8 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
     unsigned char letter=0;
     char col_letters = tree.size();
     fputc(col_letters, output_file);
-    // fwrite(reinterpret_cast<const char*>(&col_letters), sizeof(int), 1, output_file);
-    for(int i=0; i<256; i++){
+
+    for(int i=0; i<256; i++){ // Writing the letters used and their number
         if(alfabet[i] != 0){
             fputc((char)i, output_file);
             cout<<alfabet[i]<<endl;
@@ -124,7 +125,7 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
     }
 
 
-    while (!feof(input_file)) {
+    while (!feof(input_file)) { // Compressing the file
        character = fgetc(input_file);
        if(!feof(input_file)){
             string s(1, character);
@@ -159,7 +160,6 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
                     
                     
                     for(int j = i; j<huffmanCode[s].length(); j++){
-                        cout<<s<<" : "<<j<<endl;
                         k = k<<1 | (huffmanCode[s][j] - '0');
                         len++;
                     }
@@ -198,9 +198,27 @@ int coder(const char* input_name="input.txt", const char* output_name="encoded.t
     
     fclose(input_file);
     fclose(output_file);
-    return 1;
+
+    unsigned long long file_full_size = 0;
+    unsigned long long commpres_size = 0;
+    struct stat sb{};
+    struct stat se{};
+    // Finding compression ratio
+    if (!stat(input_name, &sb)) {
+        
+        file_full_size = sb.st_size;
+    } else {
+        perror("stat");
+    }
+    if (!stat(output_name, &se)) {
+        
+        commpres_size = se.st_size;
+    } else {
+        perror("stat");
+    }
+    return (file_full_size + 0.0) / commpres_size;
 }
 
 int main(){
-    coder();
+    cout<<coder()<<endl; // Print compression ratio
 }
