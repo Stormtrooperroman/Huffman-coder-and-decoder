@@ -7,13 +7,12 @@
 
 using namespace std;
 
-
 class Node{ //A tree node
     public:
     string key;
     unsigned long long size;
-    Node *R;
-    Node *L;
+    Node *R; // Right node
+    Node *L; // Left node
 
     bool operator() (const Node& x, const Node& y){ // Comparison function to be used to order the heap
         return x.size >= y.size;
@@ -26,13 +25,11 @@ class Node{ //A tree node
         R = right; 
     }
 
-
     Node * join (Node x) { // Node pooling function
         return new Node( x.key+key , x.size + size, new Node(x), this);
     }
-
-
 };
+
 Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffman tree
     while (tree.size() > 1) {
             Node *n = new Node(tree.top());
@@ -67,7 +64,6 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
         if(!feof(input_file)){
             unsigned long long col_of;
             fread(reinterpret_cast<char*>(&alfabet[character]), sizeof(unsigned long long), 1, input_file);
-            cout<<alfabet[character]<<endl;
         }
         else{
             throw invalid_argument("Can't decompress file.");
@@ -80,7 +76,6 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
             string s(1, (char)i);
             
             Node new_leaf(s, alfabet[i]);
-            cout<<s<<" : "<<alfabet[i]<<" : "<<new_leaf.size<<endl;
             tree.push(new_leaf);
         }
     }
@@ -103,9 +98,9 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
                     }
                     else{
                         nodes = nodes->R;
-                    }
-                    
+                    }                   
                 }
+
                 else if(((character >> i) & 1) == 0){
                     if(nodes->L == NULL){
                         
@@ -142,6 +137,7 @@ unsigned int checker(const char* before_name="input.txt", const char* after_name
             }
         }
     }
+
     while (!feof(after_file))
     {
         after_l = fgetc(after_file);
@@ -149,6 +145,7 @@ unsigned int checker(const char* before_name="input.txt", const char* after_name
             same++;
         }
     }
+
     while (!feof(before_file))
     {
         before_l = fgetc(before_file);

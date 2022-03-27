@@ -12,8 +12,8 @@ class Node{ //A tree node
     public:
     string key;
     unsigned long long size;
-    Node *R;
-    Node *L;
+    Node *R; // Right node
+    Node *L; // Left node
 
     bool operator() (const Node& x, const Node& y){ // Comparison function to be used to order the heap
         return x.size >= y.size;
@@ -34,7 +34,7 @@ class Node{ //A tree node
 };
 
 
-Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffman tree
+Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffman tree function
     while (tree.size() > 1) {
             Node *n = new Node(tree.top());
            
@@ -47,11 +47,10 @@ Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffma
 }
 
 
-void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huffmanCode) // Generate Huffman codes
+void huffmanCodes(Node* root, string  code, unordered_map<string, string > &huffmanCode) // Generate Huffman codes function
 {
 	if (root == nullptr)
 		return;
-    cout<<root->key<<" : "<<code<<endl;
 	if (!root->L && !root->R) {
 		huffmanCode[root->key] = code;
 	}
@@ -65,13 +64,13 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     for(int i=0; i<256; i++){
         alfabet[i] = 0;
     }
-    FILE* input_file = fopen(input_name, "r");
+    FILE* input_file = fopen(input_name, "r"); 
     if (input_file == nullptr) {
        throw invalid_argument("File not found.");
     }
 
     unsigned char character = 0;
-    while (!feof(input_file)) {
+    while (!feof(input_file)) { // Read from input file
        character = fgetc(input_file);
        if(!feof(input_file)){
            alfabet[character]++;
@@ -81,7 +80,7 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     fclose(input_file);
 
     priority_queue<Node, vector<Node>, Node> tree;
-    for(int i=0; i<256; i++){
+    for(int i=0; i<256; i++){ // Create nodes
         if(alfabet[i] != 0){
             string s(1, (char)i);
             
@@ -91,12 +90,12 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
         }
     }
 
-    Node *n = builder(tree);
+    Node *n = builder(tree); // Create tree
 
     unordered_map<string, string> huffmanCode;
-	huffmanCodes(n, "", huffmanCode);
+	huffmanCodes(n, "", huffmanCode); // Generate Huffman codes 
 
-	cout << "Huffman Codes are :\n" << '\n';
+	cout << "Huffman Codes are :\n" << '\n'; // Print Huffman codes
 	for (auto pair: huffmanCode) {
 		cout << pair.first << " " << pair.second << '\n';
 	}
@@ -119,7 +118,6 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     for(int i=0; i<256; i++){ // Writing the letters used and their number
         if(alfabet[i] != 0){
             fputc((char)i, output_file);
-            cout<<alfabet[i]<<endl;
             fwrite(reinterpret_cast<const char*>(&alfabet[i]), sizeof(unsigned long long), 1, output_file);
         }
     }
@@ -147,23 +145,24 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
                         k=0;
                         
                         for(int j = 0; j<8; j++){
-                            k = k<<1 | (huffmanCode[s][i+j] - '0');
-                            
+                            k = k<<1 | (huffmanCode[s][i+j] - '0');                            
                         }
+
                         i+=8;
                         fputc(letter, output_file);
                         letter = k;
                         
                     }
+
                     k = 0;
                     len=0;
-                    
                     
                     for(int j = i; j<huffmanCode[s].length(); j++){
                         k = k<<1 | (huffmanCode[s][j] - '0');
                         len++;
                     }
                 }
+
                 else{
                     len=0;
                     for(int i = 8-bit_len; i<huffmanCode[s].length(); i++){
@@ -171,8 +170,6 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
                         len++;
                     }
                 }
-                
-                
                 
                 bit_len = 8; 
             }
@@ -186,14 +183,12 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
                 k=0;
                 len=0;
             }
-            
-            
        }
+
        else if(bit_len<8){
            letter= letter<<8-bit_len;
            fputc(letter, output_file);
        }
-       
     }
     
     fclose(input_file);
@@ -205,13 +200,11 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     struct stat se{};
     // Finding compression ratio
     if (!stat(input_name, &sb)) {
-        
         file_full_size = sb.st_size;
     } else {
         perror("stat");
     }
     if (!stat(output_name, &se)) {
-        
         commpres_size = se.st_size;
     } else {
         perror("stat");
