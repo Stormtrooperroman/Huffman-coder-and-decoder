@@ -34,16 +34,16 @@ class Node{ //A tree node
 };
 
 
-Node * builder(priority_queue<Node, vector<Node>, Node> tree) { // Builds Huffman tree function
-    while (tree.size() > 1) {
-            Node *n = new Node(tree.top());
+Node * builder(priority_queue<Node, vector<Node>, Node> leafs) { // Builds Huffman tree function
+    while (leafs.size() > 1) {
+            Node *n = new Node(leafs.top());
            
-            tree.pop();
-            cout<<"Build: "<<n->key<<" "<<tree.top().key<<endl;
-            tree.push(*n->join(*new Node(tree.top())));
-            tree.pop();
+            leafs.pop();
+            cout<<"Build: "<<n->key<<" "<<leafs.top().key<<endl;
+            leafs.push(*n->join(*new Node(leafs.top())));
+            leafs.pop();
         }
-        return new Node(tree.top());
+        return new Node(leafs.top());
 }
 
 
@@ -79,21 +79,21 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     
     fclose(input_file);
 
-    priority_queue<Node, vector<Node>, Node> tree;
+    priority_queue<Node, vector<Node>, Node> leafs;
     for(int i=0; i<256; i++){ // Create nodes
         if(alfabet[i] != 0){
             string s(1, (char)i);
             
             Node new_leaf(s, alfabet[i]);
             cout<<s<<" : "<<alfabet[i]<<" : "<<new_leaf.size<<endl;
-            tree.push(new_leaf);
+            leafs.push(new_leaf);
         }
     }
 
-    Node *n = builder(tree); // Create tree
+    Node *tree = builder(leafs); // Create tree
 
     unordered_map<string, string> huffmanCode;
-	huffmanCodes(n, "", huffmanCode); // Generate Huffman codes 
+	huffmanCodes(tree, "", huffmanCode); // Generate Huffman codes 
 
 	cout << "Huffman Codes are :\n" << '\n'; // Print Huffman codes
 	for (auto pair: huffmanCode) {
@@ -112,7 +112,7 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
 
     unsigned int bit_len = 0;
     unsigned char letter=0;
-    char col_letters = tree.size();
+    char col_letters = leafs.size();
     fputc(col_letters, output_file);
 
     for(int i=0; i<256; i++){ // Writing the letters used and their number
