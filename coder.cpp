@@ -201,12 +201,14 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     // Finding compression ratio
     if (!stat(input_name, &sb)) {
         file_full_size = sb.st_size;
-    } else {
+    }
+    else {
         perror("stat");
     }
     if (!stat(output_name, &se)) {
         commpres_size = se.st_size;
-    } else {
+    }
+    else {
         perror("stat");
     }
     return (commpres_size + 0.0) / file_full_size;
