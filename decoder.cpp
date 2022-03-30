@@ -117,7 +117,7 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
                         nodes = nodes->L;
                     }
                 }
-           }
+            }
        }
     }
 
