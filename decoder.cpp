@@ -91,10 +91,13 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
             for (int i = 7; i > -1; i--){
                 if(((character >> i) & 1) == 1){
                     if(nodes->R == NULL){
-                        
                         letter = nodes->key[0];
-                        fputc(letter, output_file);
-                        nodes = n->R;
+                        if(alfabet[letter]>0){
+                            alfabet[letter]--;
+                            fputc(letter, output_file);
+                            nodes = n->R;
+                        }
+                        
                     }
                     else{
                         nodes = nodes->R;
@@ -103,10 +106,12 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
 
                 else if(((character >> i) & 1) == 0){
                     if(nodes->L == NULL){
-                        
                         letter = nodes->key[0];
-                        fputc(letter, output_file);
-                        nodes = n->L;
+                        if(alfabet[letter]>0){
+                            fputc(letter, output_file);
+                            nodes = n->L;
+                            alfabet[letter]--;
+                        }
                     }
                     else{
                         nodes = nodes->L;

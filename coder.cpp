@@ -209,7 +209,7 @@ double coder(const char* input_name="input.txt", const char* output_name="encode
     } else {
         perror("stat");
     }
-    return (file_full_size + 0.0) / commpres_size;
+    return (commpres_size + 0.0) / file_full_size;
 }
 
 int main(){
