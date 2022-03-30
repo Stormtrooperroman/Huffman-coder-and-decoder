@@ -96,8 +96,7 @@ void decoder(const char* input_name="encoded.txt", const char* output_name="outp
                             alfabet[letter]--;
                             fputc(letter, output_file);
                             nodes = n->R;
-                        }
-                        
+                        }             
                     }
                     else{
                         nodes = nodes->R;
